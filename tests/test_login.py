@@ -1,109 +1,49 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-# -------------------------------Вход по кнопке «Войти в аккаунт» на главной
-driver = webdriver.Chrome()
-driver.get("https://stellarburgers.nomoreparties.site/")
-
-WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button')))
-
-# Нахожу кнопку "Войти в аккаунт" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button').click()
-
-# Нахожу поле "Email" и заполняю его
-driver.find_element(By.XPATH,'//*[@id="root"]/div/main/div/form/fieldset[1]/div/div/input').send_keys("valentin_maruhin_8_777@gmail.com")
-
-# Нахожу поле "Пароль" и заполняю его
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/form/fieldset[2]/div/div/input').send_keys("123456")
-
-# Нахожу кнопку "Войти" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/form/button').click()
-
-# Добавляю явное ожидание для загрузки страницы пока не увижу кнопку Оформить заказ
-WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button')))
-
-driver.quit()
-
-# -------------------------------Вход через кнопку «Личный кабинет»
-driver = webdriver.Chrome()
-driver.get("https://stellarburgers.nomoreparties.site/")
-
-WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button')))
-
-# Нахожу кнопку "Личный кабинет" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/header/nav/a').click()
-
-# Нахожу поле "Email" и заполняю его
-driver.find_element(By.XPATH,'//*[@id="root"]/div/main/div/form/fieldset[1]/div/div/input').send_keys("valentin_maruhin_8_777@gmail.com")
-
-# Нахожу поле "Пароль" и заполняю его
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/form/fieldset[2]/div/div/input').send_keys("123456")
-
-# Нахожу кнопку "Войти" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/form/button').click()
-
-# Добавляю явное ожидание для загрузки страницы пока не увижу кнопку Оформить заказ
-WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button')))
-
-driver.quit()
+from locators import Locator
 
 
-# -------------------------------Вход через кнопку в форме регистрации
-driver = webdriver.Chrome()
-driver.get("https://stellarburgers.nomoreparties.site/")
+class TestLogin:
+    def test_login_from_main_page(self, driver):
 
-WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button')))
+        driver.find_element(By.XPATH, Locator.main_button_login).click()
+        driver.find_element(By.XPATH, Locator.auth_input_email).send_keys("valentin_maruhin_8_777@gmail.com")
+        driver.find_element(By.XPATH, Locator.auth_input_password).send_keys("123456")
+        driver.find_element(By.XPATH, Locator.auth_button_in_auth_form).click()
+        auth = WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, Locator.main_button_set_an_order))).text
 
-# Нахожу кнопку "Личный кабинет" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/header/nav/a').click()
+        assert auth == "Оформить заказ"
 
-# Нахожу кнопку "Зарегистрироваться" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/div/p[1]/a').click()
+    def test_login_from_profile(self, driver):
 
-# Нахожу кнопку "Войти" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/div/p/a').click()
+        driver.find_element(By.XPATH, Locator.profile_button).click()
+        driver.find_element(By.XPATH, Locator.auth_input_email).send_keys("valentin_maruhin_8_777@gmail.com")
+        driver.find_element(By.XPATH, Locator.auth_input_password).send_keys("123456")
+        driver.find_element(By.XPATH, Locator.auth_button_in_auth_form).click()
+        auth = WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, Locator.main_button_set_an_order))).text
 
-# Нахожу поле "Email" и заполняю его
-driver.find_element(By.XPATH,'//*[@id="root"]/div/main/div/form/fieldset[1]/div/div/input').send_keys("valentin_maruhin_8_777@gmail.com")
+        assert auth == "Оформить заказ"
 
-# Нахожу поле "Пароль" и заполняю его
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/form/fieldset[2]/div/div/input').send_keys("123456")
+    def test_login_from_registration(self, driver):
+        driver.find_element(By.XPATH, Locator.profile_button).click()
+        driver.find_element(By.XPATH, Locator.auth_button_reg_under_auth_form).click()
+        driver.find_element(By.XPATH, Locator.reg_button_login_under_reg_form).click()
+        driver.find_element(By.XPATH, Locator.auth_input_email).send_keys("valentin_maruhin_8_777@gmail.com")
+        driver.find_element(By.XPATH, Locator.auth_input_password).send_keys("123456")
+        driver.find_element(By.XPATH, Locator.auth_button_in_auth_form).click()
+        auth = WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, Locator.main_button_set_an_order))).text
 
-# Нахожу кнопку "Войти" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/form/button').click()
+        assert auth == "Оформить заказ"
 
-# Добавляю явное ожидание для загрузки страницы пока не увижу кнопку Оформить заказ
-WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button')))
+    def test_login_from_password_recovery(self, driver):
+        driver.find_element(By.XPATH, Locator.profile_button).click()
+        driver.find_element(By.XPATH, Locator.auth_button_password_recovery_under_auth_form).click()
+        driver.find_element(By.XPATH, Locator.recovery_button_login).click()
+        driver.find_element(By.XPATH, Locator.auth_input_email).send_keys("valentin_maruhin_8_777@gmail.com")
+        driver.find_element(By.XPATH, Locator.auth_input_password).send_keys("123456")
+        driver.find_element(By.XPATH, Locator.auth_button_in_auth_form).click()
+        auth = WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, Locator.main_button_set_an_order))).text
 
-driver.quit()
-
-# -------------------------------Вход через кнопку в форме восстановления пароля
-driver = webdriver.Chrome()
-driver.get("https://stellarburgers.nomoreparties.site/")
-
-WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button')))
-
-# Нахожу кнопку "Личный кабинет" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/header/nav/a').click()
-
-# Нахожу кнопку "Восстановить пароль" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/div/p[2]/a').click()
-
-# Нахожу кнопку "Войти" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/div/p/a').click()
-
-# Нахожу поле "Email" и заполняю его
-driver.find_element(By.XPATH,'//*[@id="root"]/div/main/div/form/fieldset[1]/div/div/input').send_keys("valentin_maruhin_8_777@gmail.com")
-
-# Нахожу поле "Пароль" и заполняю его
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/form/fieldset[2]/div/div/input').send_keys("123456")
-
-# Нахожу кнопку "Войти" и кликаю по ней
-driver.find_element(By.XPATH, '//*[@id="root"]/div/main/div/form/button').click()
-
-# Добавляю явное ожидание для загрузки страницы пока не увижу кнопку Оформить заказ
-WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, '//*[@id="root"]/div/main/section[2]/div/button')))
-
-driver.quit()
+        assert auth == "Оформить заказ"
